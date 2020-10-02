@@ -1,1 +1,113 @@
-# FG2020-ABAW-AU
+# Action Unit Recognition by Pairwise Deep Architecture
+This is a code for FG2020 ABAW AU detection Challenge.
+
+The paper link is here.
+
+# Tested environment
+- software
+  - python 3.7.5 (anaconda)
+  - pytorch 1.3.1
+  - scipy 1.3.1
+  - numpy 1.17.3
+  - jupyterlab 2.2.4
+- hardware
+  - AWS g3s.xlarge (GPU is needed)
+
+# How to run
+- (1) prepare datasets
+  - Aff-Wild2
+  - BP4D (FERA2017 Train set)
+    - 9 face orientations
+  - DISFA
+    - 2 face orientations
+- (2) preprocess images
+  - data augmentation for BP4D (FERA2017 Train set)
+    - create additional 2 face orientations from 3D data
+      - 60 and 80 degrees yaw
+    - create mirrored images of 9+2 face orientation images
+      - because the orientations are one side of face.
+  - image normalization
+    - perform procrustes analysis
+      - ref: https://www.mathworks.com/help/stats/procrustes.html
+      - ref: K. Niinuma, L. A. Jeni, I. O. Ertugrul, and J. F. Cohn, “Unmasking the devil in the details: What works for deep facial action coding?,” in BMVC: proceedings of the British Machine Vision Conference. British Machine Vision Conference, 2019.
+  - resizing
+    - resize all images to 224x224 (VGG16 input size)
+- (3) locate datasets
+  - locate datasets as followings
+    - Aff-Wild2
+      - ~/corpus/AffWild2/tmp/frames_for_pytorch_procrustes_occ_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/AW2_(MODE_SHORT_ID)_(VIDEO_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1
+        - MODE_ID: Train, Valid, Test
+        - AU_ID: AU01, ...
+        - LABEL_ID: OCC, NOOCC
+        - MODE_SHORT_ID: TR, VA, TE
+        - VIDEO_ID: 11M24M1920x1080XXXXXX, ...
+        - TASK_ID: T1
+        - FRAME_ID: 000001, ...
+      - Notice: Let label dirname(OCC or NOOCC) of Test set be NOOCC.
+    - BP4D (FERA2017 Train set) original 9 face orientations
+      - ~/corpus/FERA/tmp/frames_for_pytorch_procrustes_int_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/FERA17_(MODE_SHORT_ID)_(SUBJECT_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1, ..., 9
+        - MODE_ID: Train
+        - AU_ID: AU01, ...
+        - LABEL_ID: INT0, ..., INT5
+        - MODE_SHORT_ID: TR
+        - SUBJECT_ID: F001, ...
+        - TASK_ID: T1, ...
+        - FRAME_ID: 0000, ...      
+    - BP4D (FERA2017 Train set) additional face orientations
+      - ~/corpus/FERA_pose/tmp/frames_for_pytorch_procrustes_int_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/FERA17p_(MODE_SHORT_ID)_(SUBJECT_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1,2
+        - MODE_ID: Train
+        - AU_ID: AU01, ...
+        - LABEL_ID: INT0, ..., INT5
+        - MODE_SHORT_ID: TR
+        - SUBJECT_ID: F001, ...
+        - TASK_ID: T1, ...
+        - FRAME_ID: 0000, ...  
+    - BP4D (FERA2017 Train set) mirrored 9 face orientations
+      - ~/corpus/FERA_mirror/tmp/frames_for_pytorch_procrustes_int_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/FERA17m_(MODE_SHORT_ID)_(SUBJECT_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1, ..., 9
+        - MODE_ID: Train
+        - AU_ID: AU01, ...
+        - LABEL_ID: INT0, ..., INT5
+        - MODE_SHORT_ID: TR
+        - SUBJECT_ID: F001, ...
+        - TASK_ID: T1, ...
+        - FRAME_ID: 0000, ...  
+    - BP4D (FERA2017 Train set) mirrored additional 2 face orientations
+      - ~/corpus/FERA_pose_mirror/tmp/frames_for_pytorch_procrustes_int_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/FERA17pm_(MODE_SHORT_ID)_(SUBJECT_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1, 2
+        - MODE_ID: Train
+        - AU_ID: AU01, ...
+        - LABEL_ID: INT0, ..., INT5
+        - MODE_SHORT_ID: TR
+        - SUBJECT_ID: F001, ...
+        - TASK_ID: T1, ...
+        - FRAME_ID: 0000, ...      
+    - DISFA
+      - ~/corpus/DISFA/tmp/frames_for_pytorch_procrustes_int_pose(POSE_ID)/(MODE_ID)/(AU_ID)/(LABEL_ID)/DISFA_(MODE_SHORT_ID)_(SUBJECT_ID)_(TASK_ID)_(POSE_ID)_frame(FRAME_ID).jpg
+        - POSE_ID: 1, 2
+        - MODE_ID: Train
+        - AU_ID: AU01, ...
+        - LABEL_ID: INT0, ..., INT5
+        - MODE_SHORT_ID: TR
+        - SUBJECT_ID: SN001, ...
+        - TASK_ID: T001
+        - FRAME_ID: 000000, ...    
+- (4) locate and run the program (au_pairwise.ipynb)
+  - locate the program to ~/au/fg2020/
+  - set parameters of the program
+    - au_name: AU01,...
+  - run the program by jupyterlab
+- (5) confirm result
+  - result csv file path
+    - validation set: ~/au/fg2020/pred_result/pred_result__(au_name)_procrustes-intensity-pose1_ValidFull.csv
+    - test set:  ~/au/fg2020/pred_result/pred_result__(au_name)_procrustes-intensity-pose1_TestFull.csv
+  - format
+    - column 0: path ( image file path )
+    - column 1: label ( for test set, dummy data )
+    - column 2: pred ( this is prediction result )
+    
+# Copyright
+Copyright 2020 FUJITSU LABORATORIES LTD.
