@@ -1,6 +1,8 @@
 # Action Unit Recognition by Pairwise Deep Architecture
 This is a code for FG2020 ABAW AU detection Challenge.
 
+Paper link is [here](https://arxiv.org/abs/2010.00288)
+
 # Tested environment
 - software
   - python 3.7.5 (anaconda)
